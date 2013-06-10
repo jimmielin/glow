@@ -1,0 +1,8 @@
+{
+	"Name": "CoreFile",
+	"Description": "FileSystem Helper (RT Component)",
+	"Author": "Jimmie Lin",
+	"Package": "com.glow.rt.corefile",
+	"Version": 10000,
+	"HumanVersion": "%releaseversion%"
+}

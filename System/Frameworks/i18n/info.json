@@ -1,0 +1,8 @@
+{
+	"Name": "i18n",
+	"Description": "Project Glowstone i18n Helper",
+	"Author": "Jimmie Lin, I18Next Authors",
+	"Package": "com.glow.base.i18n",
+	"Version": 10000,
+	"HumanVersion": "%releaseversion%"
+}

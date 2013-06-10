@@ -1,0 +1,8 @@
+{
+	"Name": "Lockdown",
+	"Description": "Project Glowstone Lockdown Engine Helper",
+	"Author": "Jimmie Lin",
+	"Package": "com.glow.base.lockdown",
+	"Version": 10000,
+	"HumanVersion": "%releaseversion%"
+}
