@@ -38,7 +38,10 @@ var Lockdown = {
 
 			Lockdown.Instances[instance] = {
 				ID: instance,
-				Start: System.microtime()
+				Start: System.microtime(),
+				Permissions: {
+					Check: Lockdown.Permissions.Virtual.Check.bind(null, instance)
+				}
 			}
 
 			/**
@@ -71,14 +74,9 @@ var Lockdown = {
 			}");
 
 			eval("\
-			Lockdown.Instances[instance].Permissions = {\
-				List: function() {\
+			Lockdown.Instances[instance].Permissions.List = function() {\
 					return Lockdown.InstancesManager.Processes['" + instance + "'].Permissions;\
-				},\
-				Check: function(permission) {\
-					return Lockdown.Permissions.Check('" + name + "', permission);\
-				}\
-			}");
+				}");
 
 			/**
 			 * Get Permissions through the Lookup-Table
@@ -107,9 +105,7 @@ var Lockdown = {
 			Lockdown.Instances[instance].Framework[name] = {};
 			for(key in framework) {
 				if(typeof framework[key] == "function" && key != "Init") {
-					eval("Lockdown.Instances[instance].Framework[name][key] = function() {\
-						return System.Framework['" + name + "']['" + key + "'].apply(Lockdown.Instances['" + instance + "'].Framework['" + name + "'], ['" + instance + "'].concat(Array.prototype.slice.call(arguments, 0)));\
-					}");
+					Lockdown.Instances[instance].Framework[name][key] = System.Framework[name][key].bind(null, instance);
 				}
 				else {
 					Lockdown.Instances[instance].Framework[name][key] = System.Framework[name][key];

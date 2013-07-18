@@ -12,14 +12,12 @@
  * Loads everything in the Glow System, taking over the Web-Browser
  */
 
-"use strict";
-
 /**
  * The Glow API, accessible through System either in-app or via Global.
  * Note that the global System is completely different than the one provided by lockdown - Lockdown emulates a whole System, with frameworks (in .Frameworks[]), etc.
  * loaded as it requests.
  */
-var System = {
+const System = {
 	/**
 	 * Branding and Versioning Information.
 	 *
@@ -184,6 +182,14 @@ var System = {
 		/**
 		 * Initiate the User Interface.
 		 */
+
+		$(function() {
+			var widget = document.getElementById("widget");
+			widget.contentWindow.System = System.Isolated;
+			widget.contentWindow.parent = null;
+
+
+		});
 	}
 }
 
