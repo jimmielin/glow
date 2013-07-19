@@ -94,10 +94,32 @@ var Lockdown = {
 			return Lockdown.Instances[instance];
 		},
 
+		/**
+		 * Elevation-Related Operations
+		 */
 		IsElevated: function(instance) {
 			return Lockdown.InstanceManager.Processes[instance].Elevated;
 		},
 
+		Elevate: function(source, instance) {
+			Lockdown.InstanceManager.Processes[instance].Elevated = true;
+			Lockdown.Permissions.Virtual.Override(source, instance, "Elevated", true);
+
+			System.Debug.Write("[" + source + "] is elevating this instance", "LDVirtualMachine/" + instance);
+			return true;
+		},
+
+		DeElevate: function(source, instance) {
+			Lockdown.InstanceManager.Processes[instance].Elevated = false;
+			Lockdown.Permissions.Virtual.Override(source, instance, "Elevated", false);
+
+			System.Debug.Write("[" + source + "] is de-elevating this instance", "LDVirtualMachine/" + instance);
+			return true;
+		},
+
+		/**
+		 * Framework-Related Operations
+		 */
 		FrameworkIsLoaded: function(name, instance, options) {
 			return (
 				typeof Lockdown.Instances[instance].Framework[name] != "undefined" &&
@@ -163,7 +185,7 @@ var Lockdown = {
 			Check: function(instance, permission) {
 				if(Lockdown.InstanceManager.Processes[instance].Elevated)
 					return true;
-				
+
 				if(typeof this.OverrideTable[instance] != "undefined" && this.OverrideTable[instance][permission] != "undefined")
 					return this.OverrideTable[instance][permission];
 
@@ -173,13 +195,22 @@ var Lockdown = {
 			/**
 			 * Override permissions for a given instance.
 			 * This can be manipulated by any elevated instance as part of the System.AHW toolkit (Airtight HatchWay)
+			 * Don't call this to directly Elevate a instance, as this will not work. You'll have to trigger InstanceManager manually.
 			 */
 			Override: function(source, instance, permission, value) {
 				System.Debug.Write("[" + source + "] is Overriding permission " + permission + " to value " + value, "LDVirtualMachine/" + instance);
-				if(permission == "Elevated") return false; // elevating doesn't work through here. you'll have to try somewhere else.
 				this.OverrideTable[instance][permission] = value;
 
 				return true;
+			},
+
+			/**
+			 * Get Override Table
+			 * Get the overriden (virtualized) permissions of this instance.
+			 */
+			GetOverrides: function(instance) {
+				if(typeof this.OverrideTable[instance] == "undefined") return {};
+				else return this.OverrideTable[instance];
 			}
 		}
 	}
