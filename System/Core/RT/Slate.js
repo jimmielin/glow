@@ -14,8 +14,11 @@
 
 __RTAPI = {
 	call: function(Component, Action, Data, Callback) {
-		Data.GLOW_RT_ACCESS_KEY = System.RTKey;
-		$.post("http://localhost/Base/GlowRT/Slate/" + Component + "/" + Action, Data, function(result) {
+		var PostData = {};
+		PostData.GLOW_RT_ACCESS_KEY = System.RTKey;
+		PostData.data = JSON.stringify(Data);
+
+		$.post("http://localhost/Base/GlowRT/Slate/" + Component + "/" + Action, PostData, function(result) {
 			Callback(result);
 			System.Debug.Write("RT Call Complete to " + Component + "/" + Action, "GlowRT/Slate");
 		}, "json");

@@ -80,7 +80,16 @@ var Lockdown = {
 			perms = Lockdown.Permissions.Get(name);
 
 			Lockdown.InstanceManager.Processes[instance] = { 
-				Name: name, Start: Lockdown.Instances[instance].Start, Elevated: Lockdown.Permissions.Check(name, "Elevated"), Permissions: perms };
+				Name: name, 
+				Start: Lockdown.Instances[instance].Start, 
+
+				/**
+				 * Don't get me wrong here - Elevated is *not* managed by the Permissions except for the detault-state.
+				 * After that the InstanceManager will do everything independently.
+				 */
+				Elevated: Lockdown.Permissions.Check(name, "Elevated"),
+				Permissions: perms
+			};
 			
 			return Lockdown.Instances[instance];
 		},
@@ -118,7 +127,7 @@ var Lockdown = {
 			 * Get the Permissions Lookup Table.
 			 * Today is an ugly day, you'll have to live with a synchronous request. When unhappy, please fix for me.
 			 */
-			if(typeof Lockdown.Permissions.LookupTable == "undefined") {
+			if(typeof this.LookupTable == "undefined") {
 				$.ajax(
 					"System/SecurityLookupTable.json",
 					{
@@ -133,25 +142,43 @@ var Lockdown = {
 			}
 
 			// Lookup the table.
-			if(typeof Lockdown.Permissions.LookupTable[name] == "undefined") {
+			if(typeof this.LookupTable[name] == "undefined") {
 				return {};
 			}
 			else {
-				return Lockdown.Permissions.LookupTable[name];
+				return this.LookupTable[name];
 			}
 		},
 
 		Check: function(name, permission) {
-			if(typeof Lockdown.Permissions.LookupTable[name][permission] == "undefined") return false;
-			else return Lockdown.Permissions.LookupTable[name][permission];
+			if(typeof this.LookupTable[name][permission] == "undefined") return false;
+			else return this.LookupTable[name][permission];
 		},
 
 		/**
 		 * LD Virtualization.
 		 */
 		Virtual: {
+			OverrideTable: {},
 			Check: function(instance, permission) {
-				System.Debug.Write("Lockdown.Permissions.Virtual.* LD Virtualization notImplemented", "LDVirtualMachine");
+				if(Lockdown.InstanceManager.Processes[instance].Elevated)
+					return true;
+				
+				if(typeof this.OverrideTable[instance] != "undefined" && this.OverrideTable[instance][permission] != "undefined")
+					return this.OverrideTable[instance][permission];
+
+				return Lockdown.Permissions.Check(Lockdown.InstanceManager.Processes[instance].Name, permission);
+			},
+
+			/**
+			 * Override permissions for a given instance.
+			 * This can be manipulated by any elevated instance as part of the System.AHW toolkit (Airtight HatchWay)
+			 */
+			Override: function(source, instance, permission, value) {
+				System.Debug.Write("[" + source + "] is Overriding permission " + permission + " to value " + value, "LDVirtualMachine/" + instance);
+				if(permission == "Elevated") return false; // elevating doesn't work through here. you'll have to try somewhere else.
+				this.OverrideTable[instance][permission] = value;
+
 				return true;
 			}
 		}

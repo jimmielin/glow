@@ -14,13 +14,35 @@
 
 System.Framework.CoreFile = {
 	Init: function(callback) {
-		
-		
 		if(typeof callback != "undefined")
 			callback();
 	},
 
-	Test: function(a, b, c) {
-		console.log(arguments);
+	/**
+	 * CoreFile.Read
+	 * Reads a file of the specified path, restricting the user to the locked-down directory (if not Elevated) or the Glow root (if elevated)
+	 */
+	Read: function(instance, path, callback) {
+		if(typeof callback != "function") return false;
+
+		/**
+		 * Validate permissions.
+		 */
+		var fullFS = Lockdown.Permissions.Virtual.Check(instance, "System.CoreFile.FullFSAccess") && false;
+
+		/**
+		 * Call RT. Path is not validated here - it's RT's job
+		 */
+		System.RT.API.call("Files", "Read", 
+			{
+				restrict: (fullFS ? false : Lockdown.InstanceManager.Processes[instance].Name),
+				path: path
+			},
+			function(data) {
+				callback(data);
+			}
+		);
 	}
+
+
 }

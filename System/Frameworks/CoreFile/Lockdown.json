@@ -1,5 +1,3 @@
 {
-	"DefaultAct": "deny",
-	"PermissionMode": "Manual",
-	"PermissionCode": "System.CoreFile.Allow"
+	
 }

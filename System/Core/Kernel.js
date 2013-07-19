@@ -52,6 +52,8 @@ var System = {
 			if(Lockdown.InstanceManager.FrameworkIsLoaded(name, instance, options))
 				if(typeof callback == "function") callback(true);
 
+			if(typeof instance == "undefined") instance = System.Isolated.ID;
+
 			$.ajax({
 				url: "System/Frameworks/" + name + "/info.json",
 				dataType: "json",
@@ -78,7 +80,7 @@ var System = {
 									if(typeof lddata.PermissionCode != "undefined") {
 										if(!Lockdown.Permissions.Virtual.Check(instance, lddata.PermissionCode)) {
 											// abort loading ...
-											callback(false);
+											if(typeof callback == "function") callback(false);
 										}
 									}
 
@@ -188,7 +190,6 @@ var System = {
 			widget.contentWindow.System = System.Isolated;
 			widget.contentWindow.parent = null;
 			widget.contentWindow.top = null;
-
 		});
 	}
 }
