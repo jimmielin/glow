@@ -41,7 +41,8 @@ var Lockdown = {
 				Start: System.microtime(),
 				Permissions: {
 					Check: Lockdown.Permissions.Virtual.Check.bind(null, instance)
-				}
+				},
+				IsElevated: Lockdown.InstanceManager.IsElevated.bind(null, instance)
 			}
 
 			/**
@@ -62,11 +63,6 @@ var Lockdown = {
 			}");
 
 			eval("\
-			Lockdown.Instances[instance].IsElevated = function() {\
-				return Lockdown.InstanceManager.IsElevated('" + instance + "');\
-			}");
-
-			eval("\
 			Lockdown.Instances[instance].Framework = {\
 				Load: function(name, callback, options) {\
 					return System.Framework.Load(name, '" + instance + "', callback, options);\
@@ -75,7 +71,7 @@ var Lockdown = {
 
 			eval("\
 			Lockdown.Instances[instance].Permissions.List = function() {\
-					return Lockdown.InstancesManager.Processes['" + instance + "'].Permissions;\
+					return Lockdown.InstanceManager.Processes['" + instance + "'].Permissions;\
 				}");
 
 			/**

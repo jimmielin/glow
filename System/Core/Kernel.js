@@ -12,12 +12,14 @@
  * Loads everything in the Glow System, taking over the Web-Browser
  */
 
+"use strict";
+
 /**
  * The Glow API, accessible through System either in-app or via Global.
  * Note that the global System is completely different than the one provided by lockdown - Lockdown emulates a whole System, with frameworks (in .Frameworks[]), etc.
  * loaded as it requests.
  */
-const System = {
+var System = {
 	/**
 	 * Branding and Versioning Information.
 	 *
@@ -25,7 +27,7 @@ const System = {
 	 * All libraries should implement their own .Version and .HumanVersion to tag their releases.
 	 */
 	Version: 10000,
-	HumanVersion: "1.0-090613_2050-main(jimmielin)",
+	HumanVersion: "1.0-190713_2118-main(jimmielin)",
 
 	Branding: "Codename \"Glowstone\"",
 
@@ -168,7 +170,7 @@ const System = {
 		System.Start = System.microtime();
 		System.Debug.Write(System.Branding, "Kernel");
 		System.Debug.Write("(c) 2012-2014 Jimmie Lin, All Rights Reserved.", "Kernel");
-		System.Debug.Write("Version " + System.Version + " (Internal Versioning Build " + System.RealVersion + ")", "Kernel");
+		System.Debug.Write("Version " + System.HumanVersion + " (Internal Versioning Build " + System.Version + ")", "Kernel");
 
 		System.RT.Init();
 
@@ -176,8 +178,6 @@ const System = {
 		 * Start Lockdown and throw in protected system instance.
 		 */
 		System.Isolated = Lockdown.InstanceManager.New("System");
-		//console.log(System.Isolated);
-		System.Isolated.Framework.Load("CoreFile");
 
 		/**
 		 * Initiate the User Interface.
@@ -187,7 +187,7 @@ const System = {
 			var widget = document.getElementById("widget");
 			widget.contentWindow.System = System.Isolated;
 			widget.contentWindow.parent = null;
-
+			widget.contentWindow.top = null;
 
 		});
 	}
