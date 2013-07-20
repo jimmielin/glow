@@ -73,14 +73,54 @@ class FilesController extends AppController {
 
 	function LS() {
 		$fp = $this->__cleanPath("." . $this->input->path, $this->input->restrict);
-		/*if(!$fp || !is_dir($fp)) {
+		if(!$fp || !is_dir($fp)) {
 			$this->set("data", json_encode(array("code" => 0, "result" => array())));
 		}
 		else {
 			$result = scandir($fp, ($this->input->sortDesc ? SCANDIR_SORT_DESCENDING : SCANDIR_SORT_ASCENDING));
 			$this->set("data", json_encode(array("code" => 1, "result" => $result)));
-		}*/
-		$this->set("data", json_encode(array("fp" => $fp)));
+		}
+
+		$this->render("/Rt/default");
+	}
+
+	function Delete() {
+		// remove file.
+		$fp = $this->__cleanPath($this->input->path, $this->input->restrict);
+		if(!$fp || !is_dir($fp)) {
+			$this->set("data", json_encode(array("code" => 2)));
+		}
+		else {
+			$fp = $fp . DS . basename($this->input->path);
+			if(!file_exists($fp)) {
+				$this->set("data", json_encode(array("code" => 2)));
+			}
+			else {
+				$res = @unlink($fp);
+				$this->set("data", json_encode(array("code" => (int) $res)));
+			}
+		}
+
+		$this->render("/Rt/default");
+	}
+
+	function RMDir() {
+		// remove directory. uses shell as this is significantly faster.
+		$fp = $this->__cleanPath("." . $this->input->path, $this->input->restrict);
+		if(!$fp || !is_dir($fp)) {
+			$this->set("data", json_encode(array("code" => 1)));
+		}
+		else {
+			if(strlen($fp) == strlen(GLOW_ROOT_PATH) || substr(($chk = substr($fp, strpos($fp, GLOW_ROOT_PATH))), 0, 6) == "System" ||
+				substr($chk, 0, 4) == "Base") {
+				$this->set("data", json_encode(array("code" => -1)));
+			}
+			else {
+				$rs = array();
+				exec("rm -R " . $fp);
+				$this->set("data", json_encode(array("code" => (int) !is_dir($fp), "shell_result" => $rs)));
+			}
+		}
 
 		$this->render("/Rt/default");
 	}

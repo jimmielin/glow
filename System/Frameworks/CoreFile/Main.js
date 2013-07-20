@@ -76,6 +76,46 @@ System.Framework.CoreFile = {
 	},
 
 	/**
+	 * CoreFile.Delete
+	 *
+	 * Deletes a file.
+	 */
+	Delete: function(instance, path, callback) {
+		if(typeof callback != "function") return false;
+		var fullFS = Lockdown.Permissions.Virtual.Check(instance, "System.CoreFile.FullFSAccess");
+
+		System.RT.API.call("Files", "Delete", 
+			{
+				restrict: (fullFS ? false : Lockdown.InstanceManager.Processes[instance].Name),
+				path: path
+			},
+			function(data) {
+				callback(data);
+			}
+		);
+	},
+
+	/**
+	 * CoreFile.RMDir
+	 *
+	 * Deletes a directory (taking along all the files, of course).
+	 */
+	RMDir: function(instance, path, callback) {
+		if(typeof callback != "function") return false;
+		var fullFS = Lockdown.Permissions.Virtual.Check(instance, "System.CoreFile.FullFSAccess");
+
+		System.RT.API.call("Files", "RMDir", 
+			{
+				restrict: (fullFS ? false : Lockdown.InstanceManager.Processes[instance].Name),
+				path: path
+			},
+			function(data) {
+				callback(data);
+			}
+		);
+	},
+
+	/**
 	 * CoreFile.List (ls)
 	 *
 	 * Reads a directory within locked-down directory constraints
