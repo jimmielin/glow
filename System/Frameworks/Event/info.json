@@ -1,0 +1,8 @@
+{
+	"Name": "Event",
+	"Description": "Event Management Framework",
+	"Author": "Jimmie Lin",
+	"Package": "com.glow.kernel.event",
+	"Version": 10000,
+	"HumanVersion": "%releaseversion%"
+}
