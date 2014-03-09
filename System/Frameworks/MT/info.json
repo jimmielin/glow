@@ -1,0 +1,8 @@
+{
+	"Name": "MT",
+	"Description": "Native WebWorker-based Multi-Threading System",
+	"Author": "Ori Livneh (Wob.js), Jimmie Lin",
+	"Package": "com.glow.base.mt",
+	"Version": 10000,
+	"HumanVersion": "%releaseversion%"
+}

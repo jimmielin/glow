@@ -20,9 +20,9 @@ __RTAPI = {
 
 		$.post("http://localhost/Base/GlowRT/Slate/" + Component + "/" + Action, PostData, function(result) {
 			Callback(result);
-			System.Debug.Write("RT Call Complete to " + Component + "/" + Action, "GlowRT/Slate");
+			System.Debug.Write("RT/Slate", "RT Call Complete to " + Component + "/" + Action);
 		}, "json");
 
-		System.Debug.Write("RT Call Attempt to " + Component + "/" + Action, "GlowRT/Slate");
+		System.Debug.Write("RT/Slate", "RT Call Attempt to " + Component + "/" + Action);
 	}
 }

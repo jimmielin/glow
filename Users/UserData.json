@@ -1,0 +1,24 @@
+{
+	"0":
+	{
+		"Name": "root",
+		"Username": "root",
+		"Password": "--",
+		"Salt": "",
+		"Email": "root@localhost",
+		"Type": 11111111,
+		"Picture": "/Library/UserPicture.png",
+		"Accent": "#FF6A00"
+	},
+	"1":
+	{
+		"Name": "jimmie",
+		"Username": "Jimmie Lin",
+		"Password": "c8df69c623464bdcc620b312f02107f661cbd3c2005597589082a37184d6710d4a7fd8fa5bc8c2d7eab2ff2d46994cbd955cfbe164bd398826cf323feb217888",
+		"Salt": "44e196417d5d34c79940a20a9fc45ff7",
+		"Email": "jimmie.lin@gmail.com",
+		"Type": 0,
+		"Picture": "/Library/UserPicture.png",
+		"Accent": "#0094FF"
+	}
+}

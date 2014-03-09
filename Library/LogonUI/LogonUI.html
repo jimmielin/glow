@@ -1,0 +1,44 @@
+<div id="logonUI_html">
+	<div id="logonUI_main">
+		<table id="logonUI_userSelect">
+			<tr id="logonUI_userSelectAvatars"></tr>
+			<tr id="logonUI_userSelectNames"></tr>
+		</table>
+		<h1 data-i18n="LogonUI:pickUser">Pick a user account to begin.</h1>
+	</div>
+
+	<div id="logonUI_controls">
+		<a href='javascript:logonUI_shutDown()'><i class="icon">&#xF069;</i></a>
+	</div>
+
+	<div id="logonUI_watermark"><img src="/Library/System/Logo.png" id="System_boot_img" /></div>
+
+	<div id="logonUI_debug"></div>
+</div>
+
+<script type="text/javascript">
+if(System.Debug.Debug) {
+	$("#logonUI_debug").draggable();
+	function logonUI_debug() {
+		$("#logonUI_debug").fadeToggle();
+	}
+
+	var logonUI_debug_newLength, logonUI_debug_lastLength = 0;
+	reloadConsole = function() {
+		logonUI_debug_debugData = System.Debug.Read();
+		logonUI_debug_newLength = logonUI_debug_debugData.length;
+
+		for(i = logonUI_debug_lastLength; i != logonUI_debug_newLength; i++) {
+			value = logonUI_debug_debugData[i];
+			if(value.instance.substr(0, 5) == "LDVM/")
+				value.instance = "LDVM/" + value.instance.substr(5, 8) + ".." + value.instance.substr(33, 37);
+			$("#logonUI_debug").append("[" + value.time + "] [" + value.instance + "] " + value.message + "<br />");
+		}
+		
+		if(logonUI_debug_newLength > logonUI_debug_lastLength) $("#logonUI_debug").animate({scrollTop: logonUI_debug_newLength * "12"}, 'slow');
+		window.logonUI_debug_lastLength = logonUI_debug_newLength;
+	};
+
+	System.Framework.LogonUI.LD.Framework.Event.NewEvent("Debug.ConsoleUpdate", reloadConsole, 1000);
+}
+</script>

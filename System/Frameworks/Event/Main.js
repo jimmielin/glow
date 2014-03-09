@@ -12,8 +12,8 @@
  * Manages any interval-related code, does garbage collection for these now and then when things are gone.
  */
 
-System.Framework.CoreEvent = {
-	EventTable = {},
+System.Framework.Event = {
+	EventTable: {},
 
 	Init: function(callback) {
 		if(typeof callback != "undefined")
@@ -23,11 +23,13 @@ System.Framework.CoreEvent = {
 	/**
 	 * Create or Destroy Events using Dot Notation (Namespaced)
 	 */
-	NewEvent: function(key, call, interval) {
+	NewEvent: function(instance, key, call, interval) {
 		if(typeof call != "function") return false;
 		if(typeof interval != "number") return false;
 
-		obj = this.EventTable;
+		obj = System.Framework.Event.EventTable;
+
+		key = "LDVM" + instance + ".";
 		var tags = key.split('.'), length = tags.length - 1;
 		for(var i = 0; i < length; i++) {
 			if(typeof obj[tags[i]] == "undefined") obj[tags[i]] = {};
@@ -46,9 +48,9 @@ System.Framework.CoreEvent = {
 	 * and terminate them automatically using this later.
 	 * This will simply terminate the event if passed as an event, or any things nested within otherwise, in a recursive call
 	 */
-	DestroyEvent: function(key) {
-		console.log(obj);
-		obj = this.EventTable;
+	DestroyEvent: function(instance, key) {
+		obj = System.Framework.Event.EventTable;
+		key = "LDVM" + instance + ".";
 		var tags = key.split('.'), length = tags.length - 1;
 		for(var i = 0; i < length; i++) {
 			if(typeof obj[tags[i]] == "undefined") obj[tags[i]] = {};
@@ -65,7 +67,6 @@ System.Framework.CoreEvent = {
 	},
 
 	_DestroyEvent: function(obj, cursor) {
-		console.log(obj);
 		if(typeof obj == "object") {
 			for(var key in obj) {
 				if(obj.hasOwnProperty(key)) {

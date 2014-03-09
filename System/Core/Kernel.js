@@ -26,10 +26,17 @@ var System = {
 	 * System.Version is the build number (real version) and System.HumanVersion will contain the human-readable buildtag.
 	 * All libraries should implement their own .Version and .HumanVersion to tag their releases.
 	 */
-	Version: 10000,
-	HumanVersion: "1.0-190713_2118-main(jimmielin)",
+	Version: 59,
+	HumanVersion: "1.0-030814_1724-main(jimmielin)",
 
 	Branding: "Codename \"Glowstone\"",
+
+	/**
+	 * Are we a debug build? This sets security parameters Lockdown & the System will follow.
+	 * TestSigning: Allow any executable to run? This will suppress any signature checking.
+	 * Debug.Debug:   Show debuggers system-wide?
+	 */
+	TestSigning: true,
 
 	/**
 	 * Access key to GlowRT. ...g3W is used in a Pre-Installed Environment, then changed after install.
@@ -60,13 +67,13 @@ var System = {
 				success: function(data) {
 					if(typeof options.requiredVersion != "undefined") {
 						if(data.Version != options.requiredVersion) {
-							System.Debug.Write("Framework " + name + " requiredVersion (" + options.requiredVersion + ") not met (" + data.Version + "), load error.", instance);
+							System.Debug.Write(instance, "Framework " + name + " requiredVersion (" + options.requiredVersion + ") not met (" + data.Version + "), load error.");
 							if(typeof callback == "function") callback(false);
 						}
 					}
 					else if(typeof options.minimumVersion != "undefined") {
 						if(data.Version < options.requiredVersion) {
-							System.Debug.Write("Framework " + name + " minimumVersion (" + options.requiredVersion + ") not met (" + data.Version + "), load error.", instance);
+							System.Debug.Write(instance, "Framework " + name + " minimumVersion (" + options.requiredVersion + ") not met (" + data.Version + "), load error.");
 							if(typeof callback == "function") callback(false);
 						}
 					}
@@ -75,10 +82,11 @@ var System = {
 						System.Framework[name].Init(function() {
 							$.ajax({
 								url: "System/Frameworks/" + name + "/Lockdown.json",
-								dataType: "json",
-								success: function(lddata) {
+								dataType: "json"
+							}).done(function(lddata) {
 									if(typeof lddata.PermissionCode != "undefined") {
 										if(!Lockdown.Permissions.Virtual.Check(instance, lddata.PermissionCode)) {
+											System.Debug.Write("LDVM/" + instance, "Failed to Load Framework: " + name + " (LD Permission Check Failed)");
 											// abort loading ...
 											if(typeof callback == "function") callback(false);
 										}
@@ -86,16 +94,14 @@ var System = {
 
 									System.Framework[name].Data = data; // copy info.json into it
 									System.Framework[name].LDData = lddata; // copy lockdown.json into it
-									System.Debug.Write("Loaded Framework " + name, instance);
+									System.Debug.Write("LDVM/" + instance, "Loaded Framework " + name);
 									Lockdown.InstanceManager.FrameworkAssign(System.Framework[name], name, instance, callback);
-								},
-								error: function(obj, error) {
+							}).fail(function(obj, error) {
 									// no Lockdown.json declared
 									System.Framework[name].Data = data; // copy info.json into it
-									System.Debug.Write("Loaded Framework " + name, instance);
+									System.Debug.Write("LDVM/" + instance, "Loaded Framework " + name + " (Lockdown Config File = No)");
 									Lockdown.InstanceManager.FrameworkAssign(System.Framework[name], name, instance, callback);
-								}
-							})
+							});
 
 						});
 					});
@@ -122,7 +128,7 @@ var System = {
 		 * Push a debug message
 		 */
 		Messages: new Array,
-		Write: function(message, instance) {
+		Write: function(instance, message) {
 			this.Messages.push({time: (System.microtime() - System.Start).toFixed(8), message: message, instance: instance});
 			if(this.Debug == true)
 				console.log({time: (System.microtime() - System.Start).toFixed(8), message: message, instance: instance});
@@ -150,7 +156,7 @@ var System = {
 				// make a test call
 				System.RT.API.call("Rt", "lscpu", {}, function(data) {
 					System.RT.lscpu = data;
-					System.Debug.Write("RT Access Test Passed", "SystemRT");
+					System.Debug.Write("RT", "RT Access Test Passed");
 				})
 			});
 		}
@@ -160,7 +166,15 @@ var System = {
 	 * User Authentication System
 	 */
 	User: {
-
+		Init: function() {
+			$.ajax({
+				url: "Users/UserData.json",
+				dataType: "json",
+				success: function(data) {
+					System.User.UserData = data;
+				}
+			});
+		}
 
 	},
 
@@ -170,27 +184,39 @@ var System = {
 	 */
 	Boot: function() {
 		System.Start = System.microtime();
-		System.Debug.Write(System.Branding, "Kernel");
-		System.Debug.Write("(c) 2012-2014 Jimmie Lin, All Rights Reserved.", "Kernel");
-		System.Debug.Write("Version " + System.HumanVersion + " (Internal Versioning Build " + System.Version + ")", "Kernel");
+		System.Debug.Write("Kernel", System.Branding);
+		System.Debug.Write("Kernel", "(c) 2012-2014 Jimmie Lin, All Rights Reserved.");
+		System.Debug.Write("Kernel", "Version " + System.HumanVersion + " (Internal Versioning Build " + System.Version + ")");
+		if(System.Debug.Debug)
+			System.Debug.Write("Kernel", "<b>Warning:</b> External Kernel Debugger Enabled. This may slow down the performance of the system.");
+		if(System.TestSigning)
+			System.Debug.Write("Kernel", "<b>Warning:</b> Secure Boot isn't configured correctly.");
 
+		System.User.Init();
 		System.RT.Init();
 
 		/**
-		 * Start Lockdown and throw in protected system instance.
+		 * Initiate Cryptography Classes (Standard Implementations from CryptoJS)
 		 */
+		System.Crypto = CryptoJS;
+		System.InitialSeed = CryptoJS.lib.WordArray.random(128/8).toString();
+
 		System.Isolated = Lockdown.InstanceManager.New("System");
 
 		/**
-		 * Initiate the User Interface.
+		 * Initiate the LogonUI and pass everything off to CoreUI.
 		 */
+		System.Framework.Load("i18n", System.Isolated.ID, function() {
+			System.Framework.Load("LogonUI", System.Isolated.ID);
+		});
 
+		/* 
 		$(function() {
 			var widget = document.getElementById("widget");
 			widget.contentWindow.System = System.Isolated;
 			widget.contentWindow.parent = null;
 			widget.contentWindow.top = null;
-		});
+		}); */
 	}
 }
 

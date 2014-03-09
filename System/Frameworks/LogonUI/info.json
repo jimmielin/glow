@@ -1,0 +1,8 @@
+{
+	"Name": "LogonUI",
+	"Description": "Project Glowstone Logon User Interface",
+	"Author": "Jimmie Lin",
+	"Package": "com.glow.base.logonui",
+	"Version": 10000,
+	"HumanVersion": "%releaseversion%"
+}

@@ -3,15 +3,27 @@
 <head>
 	<title>Glowstone</title>
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8" />
+	<link rel="stylesheet" type="text/css" href="/Base/WebSupport/normalize.css" id="Normalize_css" />
+	<link rel="stylesheet" type="text/css" href="/Library/System/Boot.css" id="System_boot_css" />
 
 	<script type="text/javascript" src="/Base/WebSupport/jquery.js"></script>
 	<script type="text/javascript" src="/Base/WebSupport/jquery-ui.js"></script>
 	<script type="text/javascript" src="/Base/WebSupport/i18next.js"></script>
+	<script type="text/javascript" src="/System/Core/Crypto/aes.js"></script>
+	<script type="text/javascript" src="/System/Core/Crypto/sha256.js"></script>
+	<script type="text/javascript" src="/System/Core/Crypto/md5.js"></script>
+	<script type="text/javascript" src="/System/Core/Crypto/pbkdf2.js"></script>
 	<script type="text/javascript" src="/System/Core/Lockdown.js"></script>
 	<script type="text/javascript" src="/System/Core/Kernel.js"></script>
+	<script type="text/javascript" src="/System/Core/MultiThread.js"></script>
 </head>
 <body>
+	<div id="System_boot">
+		<center>
+			<img src="/Library/System/Boot.png" id="System_boot_img" />
 
-	<iframe id="widget" src="/debug.html" sandbox="allow-same-origin allow-scripts"></iframe>
+		</center>
+	</div>
+	<!--<iframe id="widget" src="/debug.html" sandbox="allow-same-origin allow-scripts"></iframe>-->
 </body>
 </html>

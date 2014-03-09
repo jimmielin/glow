@@ -1,6 +1,4 @@
 {
-	"System":
-		{
-			"Elevated": true
-		}
+	"System":  { "Elevated": true },
+	"LogonUI": { "Elevated": true }
 }
